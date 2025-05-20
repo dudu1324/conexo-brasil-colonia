@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Conexo - Brasil Colônia</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; }
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-width: 600px; margin: 20px auto; }
+    .word { border: 2px solid #444; padding: 12px; border-radius: 8px; background: #f0f0f0; cursor: pointer; transition: 0.2s; }
+    .selected { background: #add8e6; }
+    button { padding: 10px 20px; font-size: 16px; margin-top: 15px; }
+  </style>
+</head>
+<body>
+  <h1>Conexo: Brasil Colônia</h1>
+  <p>Selecione 4 palavras que tenham relação entre si</p>
+  <div class="grid" id="grid"></div>
+  <button onclick="verificarGrupo()">Verificar</button>
+
+  <script>
+    const palavras = [
+      { texto: "Cana-de-açúcar", grupo: "Economia" },
+      { texto: "Monocultura", grupo: "Economia" },
+      { texto: "Escravidão", grupo: "Economia" },
+      { texto: "Exportação", grupo: "Economia" },
+
+      { texto: "Capitanias", grupo: "Administração" },
+      { texto: "Governo-Geral", grupo: "Administração" },
+      { texto: "Tomé de Souza", grupo: "Administração" },
+      { texto: "Ouvidores", grupo: "Administração" },
+
+      { texto: "Jesuítas", grupo: "Religião" },
+      { texto: "Missões", grupo: "Religião" },
+      { texto: "Catequese", grupo: "Religião" },
+      { texto: "Companhia de Jesus", grupo: "Religião" },
+
+      { texto: "Palmares", grupo: "Conflitos" },
+      { texto: "Emboabas", grupo: "Conflitos" },
+      { texto: "Revolta de Beckman", grupo: "Conflitos" },
+      { texto: "Guerras Justas", grupo: "Conflitos" },
+    ];
+
+    // Embaralha as palavras
+    palavras.sort(() => Math.random() - 0.5);
+
+    const grid = document.getElementById("grid");
+    const selecionadas = [];
+
+    palavras.forEach((p, i) => {
+      const div = document.createElement("div");
+      div.className = "word";
+      div.textContent = p.texto;
+      div.onclick = () => toggleSelecao(div, i);
+      grid.appendChild(div);
+    });
+
+    function toggleSelecao(div, index) {
+      if (selecionadas.includes(index)) {
+        selecionadas.splice(selecionadas.indexOf(index), 1);
+        div.classList.remove("selected");
+      } else if (selecionadas.length < 4) {
+        selecionadas.push(index);
+        div.classList.add("selected");
+      }
+    }
+
+    function verificarGrupo() {
+      if (selecionadas.length !== 4) {
+        alert("Selecione exatamente 4 palavras.");
+        return;
+      }
+      const grupos = selecionadas.map(i => palavras[i].grupo);
+      const mesmoGrupo = grupos.every(g => g === grupos[0]);
+
+      if (mesmoGrupo) {
+        alert("Correto! Todas pertencem ao grupo: " + grupos[0]);
+      } else {
+        alert("Errado! As palavras selecionadas pertencem a grupos diferentes.");
+      }
+
+      // Reset seleção
+      selecionadas.forEach(i => grid.children[i].classList.remove("selected"));
+      selecionadas.length = 0;
+    }
+  </script>
+</body>
+</html>
