@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conexo - Brasil Colônia</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+      text-align: center;
+      padding: 20px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      max-width: 600px;
+      margin: 20px auto;
+    }
+    .word {
+      border: 2px solid #334155;
+      background: #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      user-select: none;
+    }
+    .selected {
+      background-color: #60a5fa;
+      color: white;
+    }
+    .correct {
+      background-color: #22c55e !important; /* verde */
+      color: white;
+      pointer-events: none;
+    }
+    .incorrect {
+      background-color: #ef4444 !important; /* vermelho */
+      color: white;
+      animation: shake 0.3s;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Conexo: Brasil Colônia</h1>
+  <p>Agrupe 4 palavras com algo em comum</p>
+  <div class="grid" id="grid"></div>
+  <button onclick="verificarGrupo()">Verificar Grupo</button>
+
+  <script>
+    const palavras = [
+      { texto: "Cana-de-açúcar", grupo: "Economia" },
+      { texto: "Monocultura", grupo: "Economia" },
+      { texto: "Escravidão", grupo: "Economia" },
+      { texto: "Exportação", grupo: "Economia" },
+      { texto: "Capitanias", grupo: "Administração" },
+      { texto: "Governo-Geral", grupo: "Administração" },
+      { texto: "Tomé de Souza", grupo: "Administração" },
+      { texto: "Ouvidores", grupo: "Administração" },
+      { texto: "Jesuítas", grupo: "Religião" },
+      { texto: "Missões", grupo: "Religião" },
+      { texto: "Catequese", grupo: "Religião" },
+      { texto: "Companhia de Jesus", grupo: "Religião" },
+      { texto: "Palmares", grupo: "Conflitos" },
+      { texto: "Emboabas", grupo: "Conflitos" },
+      { texto: "Revolta de Beckman", grupo: "Conflitos" },
+      { texto: "Guerras Justas", grupo: "Conflitos" }
+    ];
+
+    palavras.sort(() => Math.random() - 0.5);
+
+    const grid = document.getElementById("grid");
+    const selecionadas = [];
+
+    palavras.forEach((palavra, index) => {
+      const div = document.createElement("div");
+      div.className = "word";
+      div.innerText = palavra.texto;
+      div.onclick = () => toggleSelecao(div, index);
+      grid.appendChild(div);
+    });
+
+    function toggleSelecao(elemento, index) {
+      const i = selecionadas.indexOf(index);
+      if (i > -1) {
+        selecionadas.splice(i, 1);
+        elemento.classList.remove("selected");
+      } else {
+        if (selecionadas.length < 4) {
+          selecionadas.push(index);
+          elemento.classList.add("selected");
+        }
+      }
+    }
+
+    function verificarGrupo() {
+      if (selecionadas.length !== 4) {
+        alert("Selecione exatamente 4 palavras.");
+        return;
+      }
+      const grupos = selecionadas.map(i => palavras[i].grupo);
+      const mesmoGrupo = grupos.every(g => g === grupos[0]);
+
+      if (mesmoGrupo) {
+        selecionadas.forEach(i => {
+          const el = grid.children[i];
+          el.classList.remove("selected");
+          el.classList.add("correct");
+        });
+      } else {
+        selecionadas.forEach(i => {
+          const el = grid.children[i];
+          el.classList.add("incorrect");
+          setTimeout(() => el.classList.remove("incorrect"), 800);
+        });
+      }
+
+      selecionadas.forEach(i => grid.children[i].classList.remove("selected"));
+      selecionadas.length = 0;
+    }
+  </script>
+</body>
+</html>
