@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conexo - Brasil Colônia</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #7b4f27; /* marrom */
+      color: #f1f5f9;
+      text-align: center;
+      padding: 20px;
+      transition: background-color 0.5s ease;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      max-width: 600px;
+      margin: 20px auto;
+    }
+    .word {
+      border: 2px solid #334155;
+      background: #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      user-select: none;
+      color: black;
+    }
+    .selected {
+      background-color: #60a5fa;
+      color: white;
+    }
+    .correct {
+      background-color: #22c55e !important;
+      color: white;
+      pointer-events: none;
+    }
+    .incorrect {
+      background-color: #ef4444 !important;
+      color: white;
+      animation: shake 0.3s;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #next-round {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Conexo: Brasil Colônia</h1>
+  <p>Agrupe 4 palavras com algo em comum</p>
+  <div class="grid" id="grid"></div>
+  <button onclick="verificarGrupo()">Verificar Grupo</button>
+  <button id="next-round" onclick="carregarRodada2()">Próxima Rodada</button>
+
+  <script>
+    const rodada1 = [
+      { texto: "Cana-de-açúcar", grupo: "Economia" },
+      { texto: "Monocultura", grupo: "Economia" },
+      { texto: "Escravidão", grupo: "Economia" },
+      { texto: "Exportação", grupo: "Economia" },
+      { texto: "Capitanias", grupo: "Administração" },
+      { texto: "Governo-Geral", grupo: "Administração" },
+      { texto: "Tomé de Souza", grupo: "Administração" },
+      { texto: "Ouvidores", grupo: "Administração" },
+      { texto: "Jesuítas", grupo: "Religião" },
+      { texto: "Missões", grupo: "Religião" },
+      { texto: "Catequese", grupo: "Religião" },
+      { texto: "Companhia de Jesus", grupo: "Religião" },
+      { texto: "Palmares", grupo: "Conflitos" },
+      { texto: "Emboabas", grupo: "Conflitos" },
+      { texto: "Revolta de Beckman", grupo: "Conflitos" },
+      { texto: "Guerras Justas", grupo: "Conflitos" }
+    ];
+
+    const rodada2 = [
+      { texto: "Tabaco", grupo: "Produtos" },
+      { texto: "Algodão", grupo: "Produtos" },
+      { texto: "Ouro", grupo: "Produtos" },
+      { texto: "Couros", grupo: "Produtos" },
+      { texto: "Ouvidoria", grupo: "Instituições" },
+      { texto: "Casa de Fundição", grupo: "Instituições" },
+      { texto: "Alvará Régio", grupo: "Instituições" },
+      { texto: "Câmara Municipal", grupo: "Instituições" },
+      { texto: "Bandeirantes", grupo: "Indígenas" },
+      { texto: "Sertanismo", grupo: "Indígenas" },
+      { texto: "Cativeiro", grupo: "Indígenas" },
+      { texto: "Justificação", grupo: "Indígenas" },
+      { texto: "Felipe dos Santos", grupo: "Rebeliões" },
+      { texto: "Mascates", grupo: "Rebeliões" },
+      { texto: "Caramurus", grupo: "Rebeliões" },
+      { texto: "Vila Rica", grupo: "Rebeliões" }
+    ];
+
+    let palavras = [...rodada1];
+    palavras.sort(() => Math.random() - 0.5);
+
+    const grid = document.getElementById("grid");
+    const selecionadas = [];
+    let gruposConcluidos = [];
+    let rodadaAtual = 1;
+
+    function renderizarGrid() {
+      grid.innerHTML = "";
+      palavras.forEach((palavra, index) => {
+        const div = document.createElement("div");
+        div.className = "word";
+        div.innerText = palavra.texto;
+        div.onclick = () => toggleSelecao(div, index);
+        grid.appendChild(div);
+      });
+    }
+
+    renderizarGrid();
+
+    function toggleSelecao(elemento, index) {
+      const i = selecionadas.indexOf(index);
+      if (i > -1) {
+        selecionadas.splice(i, 1);
+        elemento.classList.remove("selected");
+      } else {
+        if (selecionadas.length < 4) {
+          selecionadas.push(index);
+          elemento.classList.add("selected");
+        }
+      }
+    }
+
+    function verificarGrupo() {
+      if (selecionadas.length !== 4) {
+        alert("Selecione exatamente 4 palavras.");
+        return;
+      }
+
+      const grupos = selecionadas.map(i => palavras[i].grupo);
+      const mesmoGrupo = grupos.every(g => g === grupos[0]);
+
+      if (mesmoGrupo) {
+        gruposConcluidos.push(grupos[0]);
+        selecionadas.forEach(i => {
+          const el = grid.children[i];
+          el.classList.remove("selected");
+          el.classList.add("correct");
+        });
+        if (gruposConcluidos.length === 4) {
+          if (rodadaAtual === 1) {
+            document.getElementById("next-round").style.display = "inline-block";
+          } else {
+            document.body.style.backgroundColor = "#f5f5dc";
+          }
+        }
+      } else {
+        selecionadas.forEach(i => {
+          const el = grid.children[i];
+          el.classList.add("incorrect");
+          setTimeout(() => el.classList.remove("incorrect"), 800);
+        });
+      }
+
+      selecionadas.forEach(i => grid.children[i].classList.remove("selected"));
+      selecionadas.length = 0;
+    }
+
+    function carregarRodada2() {
+      rodadaAtual = 2;
+      palavras = [...rodada2];
+      palavras.sort(() => Math.random() - 0.5);
+      gruposConcluidos = [];
+      selecionadas.length = 0;
+      document.getElementById("next-round").style.display = "none";
+      document.body.style.backgroundColor = "#7b4f27";
+      renderizarGrid();
+    }
+  </script>
+</body>
+</html>
